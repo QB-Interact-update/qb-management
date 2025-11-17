@@ -214,70 +214,38 @@ end)
 
 -- MAIN THREAD
 CreateThread(function()
-    if Config.UseTarget then
-        for job, zones in pairs(Config.BossMenus) do
-            for index, coords in ipairs(zones) do
-                local zoneName = job .. '_bossmenu_' .. index
+    for job, zones in pairs(Config.BossMenus) do
+        for index, coords in ipairs(zones) do
+            local options = {
+                {
+                    type = 'client',
+                    event = 'qb-bossmenu:client:OpenMenu',
+                    icon = 'fas fa-sign-in-alt',
+                    label = Lang:t('target.label'),
+                    canInteract = function() return job == PlayerJob.name and PlayerJob.isboss end,
+                },
+            }
+            local zoneName = job .. '_bossmenu_' .. index
+            if Config.UseTarget then
                 exports['qb-target']:AddCircleZone(zoneName, coords, 0.5, {
                     name = zoneName,
                     debugPoly = false,
                     useZ = true
                 }, {
-                    options = {
-                        {
-                            type = 'client',
-                            event = 'qb-bossmenu:client:OpenMenu',
-                            icon = 'fas fa-sign-in-alt',
-                            label = Lang:t('target.label'),
-                            canInteract = function() return job == PlayerJob.name and PlayerJob.isboss end,
-                        },
-                    },
+                    options = options,
                     distance = 2.5
                 })
+            else
+                exports['qb-interact']:addInteractZone({
+                    name = zoneName,
+                    coords = coords,
+                    height = 2.0,
+                    width = 2.4,
+                    length = 2.0,
+                    options = options,
+                    debugPoly = false,
+                })
             end
-        end
-    else
-        while true do
-            local wait = 2500
-            local pos = GetEntityCoords(PlayerPedId())
-            local inRangeBoss = false
-            local nearBossmenu = false
-            if PlayerJob then
-                wait = 0
-                for k, menus in pairs(Config.BossMenus) do
-                    for _, coords in ipairs(menus) do
-                        if k == PlayerJob.name and PlayerJob.isboss then
-                            if #(pos - coords) < 5.0 then
-                                inRangeBoss = true
-                                if #(pos - coords) <= 1.5 then
-                                    nearBossmenu = true
-                                    if not shownBossMenu then
-                                        exports['qb-core']:DrawText(Lang:t('drawtext.label'), 'left')
-                                        shownBossMenu = true
-                                    end
-                                    if IsControlJustReleased(0, 38) then
-                                        exports['qb-core']:HideText()
-                                        TriggerEvent('qb-bossmenu:client:OpenMenu')
-                                    end
-                                end
-
-                                if not nearBossmenu and shownBossMenu then
-                                    CloseMenuFull()
-                                    shownBossMenu = false
-                                end
-                            end
-                        end
-                    end
-                end
-                if not inRangeBoss then
-                    Wait(1500)
-                    if shownBossMenu then
-                        CloseMenuFull()
-                        shownBossMenu = false
-                    end
-                end
-            end
-            Wait(wait)
         end
     end
 end)

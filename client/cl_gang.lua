@@ -216,71 +216,38 @@ end)
 -- MAIN THREAD
 
 CreateThread(function()
-    if Config.UseTarget then
-        for gang, zones in pairs(Config.GangMenus) do
-            for index, coords in ipairs(zones) do
-                local zoneName = gang .. '_gangmenu_' .. index
+    for gang, zones in pairs(Config.GangMenus) do
+        for index, coords in ipairs(zones) do
+            local zoneName = gang .. '_gangmenu_' .. index
+            local options = {
+                {
+                    type = 'client',
+                    event = 'qb-gangmenu:client:OpenMenu',
+                    icon = 'fas fa-sign-in-alt',
+                    label = Lang:t('targetgang.label'),
+                    canInteract = function() return gang == PlayerGang.name and PlayerGang.isboss end,
+                },
+            }
+            if Config.UseTarget then
                 exports['qb-target']:AddCircleZone(zoneName, coords, 0.5, {
                     name = zoneName,
                     debugPoly = false,
                     useZ = true
                 }, {
-                    options = {
-                        {
-                            type = 'client',
-                            event = 'qb-gangmenu:client:OpenMenu',
-                            icon = 'fas fa-sign-in-alt',
-                            label = Lang:t('targetgang.label'),
-                            canInteract = function() return gang == PlayerGang.name and PlayerGang.isboss end,
-                        },
-                    },
+                    options = options,
                     distance = 2.5
                 })
+            else
+                exports['qb-interact']:addInteractZone({
+                    name = zoneName,
+                    coords = coords,
+                    height = 2.0,
+                    width = 2.4,
+                    length = 2.0,
+                    options = options,
+                    debugPoly = false,
+                })
             end
-        end
-    else
-        while true do
-            local wait = 2500
-            local pos = GetEntityCoords(PlayerPedId())
-            local inRangeGang = false
-            local nearGangmenu = false
-            if PlayerGang then
-                wait = 0
-                for k, menus in pairs(Config.GangMenus) do
-                    for _, coords in ipairs(menus) do
-                        if k == PlayerGang.name and PlayerGang.isboss then
-                            if #(pos - coords) < 5.0 then
-                                inRangeGang = true
-                                if #(pos - coords) <= 1.5 then
-                                    nearGangmenu = true
-                                    if not shownGangMenu then
-                                        exports['qb-core']:DrawText(Lang:t('drawtextgang.label'), 'left')
-                                        shownGangMenu = true
-                                    end
-
-                                    if IsControlJustReleased(0, 38) then
-                                        exports['qb-core']:HideText()
-                                        TriggerEvent('qb-gangmenu:client:OpenMenu')
-                                    end
-                                end
-
-                                if not nearGangmenu and shownGangMenu then
-                                    CloseMenuFullGang()
-                                    shownGangMenu = false
-                                end
-                            end
-                        end
-                    end
-                end
-                if not inRangeGang then
-                    Wait(1500)
-                    if shownGangMenu then
-                        CloseMenuFullGang()
-                        shownGangMenu = false
-                    end
-                end
-            end
-            Wait(wait)
         end
     end
 end)
