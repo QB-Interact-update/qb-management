@@ -5,9 +5,6 @@
 
 ## Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
-- [qb-smallresources](https://github.com/qbcore-framework/qb-smallresources) (For the Logs)
-- [qb-input](https://github.com/qbcore-framework/qb-input)
-- [qb-menu](https://github.com/qbcore-framework/qb-menu)
 - [qb-inventory](https://github.com/qbcore-framework/qb-inventory)
 - [qb-clothing](https://github.com/qbcore-framework/qb-clothing)
 
@@ -28,3 +25,4 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>
+
