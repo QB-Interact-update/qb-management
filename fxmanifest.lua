@@ -5,18 +5,24 @@ author 'Kakarot'
 description 'Employee management system allowing players to hire/fire other players'
 version '2.1.2'
 
-shared_scripts {
-    '@qb-core/shared/locale.lua',
+
+ui_page 'web/build/index.html'
+
+client_script {
+    'client/client.lua'
+}
+server_script {
+  '@oxmysql/lib/MySQL.lua',
+  "server/server.lua"
+}
+shared_script {
+   '@qb-core/shared/locale.lua',
     'locales/en.lua',
     'locales/*.lua',
-    'config.lua',
+  "shared/Config.lua"
 }
-
-client_scripts {
-    'client/*.lua'
-}
-
-server_scripts {
-    '@oxmysql/lib/MySQL.lua',
-    'server/*.lua'
+files {
+  'locales/*.lua',
+  'web/build/index.html',
+  'web/build/**/*'
 }
